@@ -21,7 +21,7 @@ def describe_current_room(game_state):
     Параметры:
         game_state (dict): состояние игрока.
     Возвращает:
-        str: текстовое описание комнаты.
+        str: текстовое описание комнаты
     """
     curr_room = game_state['current_room']
     print(f"== {curr_room} ==")
