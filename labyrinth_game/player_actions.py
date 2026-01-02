@@ -1,6 +1,7 @@
 try:
     #from labyrinth_game.main import game_state
     from labyrinth_game.constant import ROOMS
+    from labyrinth_game.utils import random_event
 except:
     #from main import game_state
     from constant import ROOMS
@@ -41,10 +42,21 @@ def move_player(game_state, direction):
     """
     current_room = game_state['current_room']
     if direction in ROOMS[current_room]['exits'].keys():
-        game_state['current_room'] = ROOMS[current_room]['exits'][direction]
-        game_state['steps_taken'] += 1
-        print(ROOMS[game_state['current_room']]['description'])
-        #random_event(game_state)
+        if ROOMS[current_room]['exits'][direction] == 'treasure_room':
+            if 'rusty_key' in game_state['player_inventory']:
+                print('Вы используете найденный ключ, чтобы открыть путь в комнату сокровищ.')
+                game_state['current_room'] = ROOMS[current_room]['exits'][direction]
+                game_state['steps_taken'] += 1
+                print(ROOMS[game_state['current_room']]['description'])
+                random_event(game_state)
+            else:
+                print('Для доступа в комнату вам нужен особый ключ')
+                return
+        else:
+            game_state['current_room'] = ROOMS[current_room]['exits'][direction]
+            game_state['steps_taken'] += 1
+            print(ROOMS[game_state['current_room']]['description'])
+            random_event(game_state)
     else:
         print('Нельзя пойти в этом направлении.')
 
@@ -80,7 +92,4 @@ def use_item(game_state, item_name):
                     print('Ключ постоянно ускользает от вашего взора, его нужно применить в другом месте')
             case _:
                 print(f'Игрок не знает, как их использовать: {item_name}')
-
-
-
 

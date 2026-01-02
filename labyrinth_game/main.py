@@ -29,18 +29,19 @@ def main():
             print('Вы вышли из игры')
             break
         process_command(game_state, user_input)
-    if game_state['game_over']  == True and 'guldan_skull' in game_state['player_inventory']:
-        print('ПОБЕДААА!')
+    #if game_state['game_over']  == True and 'guldan_skull' in game_state['player_inventory']:
+   #     print('ПОБЕДААА!')
 
 if __name__ == "__main__":
     main()
 
-
-utils.random_event(game_state)
-
 def process_command(game_state, command):
     command = command.lower().split()
-    try:
+    #try:
+
+    if command[0] in ('north', 'east', 'west', 'south'):
+        player_actions.move_player(game_state, command[0])
+    else:
         match command[0]:
             case 'look':
                 utils.describe_current_room(game_state)
@@ -63,13 +64,5 @@ def process_command(game_state, command):
                 return
             case _:
                 print('Неизвестная команда')
-    except:
-        print('Ошибка в команде')
-
-
-#process_command(game_state, 'go north')
-#process_command(game_state, 'look')
-##show_inventory(game_state)
-#use_item(game_state, 'bronze box')
-#show_inventory(game_state)
-#utils.solve_puzzle(game_state)
+    #except:
+    #    print('Ошибка в команде')
