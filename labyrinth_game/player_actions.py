@@ -1,11 +1,12 @@
-try:
-    #from labyrinth_game.main import game_state
-    from labyrinth_game.constant import ROOMS
-    from labyrinth_game.utils import random_event
-except:
-    #from main import game_state
-    from constant import ROOMS
-    from utils import random_event
+from labyrinth_game.constant import ROOMS
+from labyrinth_game.utils import random_event
+
+# try:
+#     from labyrinth_game.constant import ROOMS
+#     from labyrinth_game.utils import random_event
+# except:
+#     from constant import ROOMS
+#     from utils import random_event
 
 def show_inventory(game_state):
     """
@@ -44,7 +45,7 @@ def move_player(game_state, direction):
     if direction in ROOMS[current_room]['exits'].keys():
         if ROOMS[current_room]['exits'][direction] == 'treasure_room':
             if 'rusty_key' in game_state['player_inventory']:
-                print('Вы используете найденный ключ, чтобы открыть путь в комнату сокровищ.')
+                print('Вы используете ключ, чтобы открыть путь в соквовищницу')
                 game_state['current_room'] = ROOMS[current_room]['exits'][direction]
                 game_state['steps_taken'] += 1
                 print(ROOMS[game_state['current_room']]['description'])
@@ -82,14 +83,16 @@ def use_item(game_state, item_name):
             case 'sword':
                 print('Ты стал увереннее')
             case 'bronze_box':
-                print('Шкатулка открыта. В ваш инвентарь добавлен предмет: rusty_key')
-                game_state['player_inventory'].append('rusty_key')
+                if 'rusty_key' in game_state['player_inventory']:
+                    print('Шкатулка пуста')
+                else:
+                    print('Шкатулка открыта. В ваш инвентарь добавлен: rusty_key')
+                    game_state['player_inventory'].append('rusty_key')
             case 'ghost_key':
                 if game_state['current_room'] == 'hiden_treasure_room':
                     game_state['player_inventory'].append('guldan_skull')
-                    print('ПОБЕДА')
                 else:
-                    print('Ключ постоянно ускользает от вашего взора, его нужно применить в другом месте')
+                    print('Ключ ускользает от вашего взора')
             case _:
                 print(f'Игрок не знает, как их использовать: {item_name}')
 

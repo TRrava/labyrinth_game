@@ -1,7 +1,6 @@
-#from cleo.io.inputs.input import Input
 import math
 
-#import main
+from labyrinth_game.constant import ROOMS
 
 RANDOM_STATE_1 = 12.9898
 RANDOM_STATE_2 = 43758.5453
@@ -10,10 +9,10 @@ HERO_HP = 3
 RANDOM_EVENT = 10
 EVENT_COUNT = 2
 
-try:
-    from labyrinth_game.constant import ROOMS
-except:
-    from constant import ROOMS
+# try:
+#     from labyrinth_game.constant import ROOMS
+# except:
+#     from constant import ROOMS
 
 def describe_current_room(game_state):
     """
@@ -75,19 +74,21 @@ def solve_puzzle(game_state):
 def attempt_open_treasure(game_state):
     if game_state['current_room'] == 'treasure_room':
         if 'rusty_key' in game_state['player_inventory']:
-            print('Вы применяете ключ, и замок щёлкает. Сундук открыт! Вы Победили!')
+            print('Вы применяете ключ, и замок щёлкает.\n'
+                  ' Сундук открыт! Вы Победили!')
             ROOMS[game_state['current_room']]['items'].remove('treasure_chest')
             ROOMS[game_state['current_room']]['puzzle'] = None
             game_state['game_over'] = True
         else:
-            user_answer = input('Сундук заперт. ... Ввести код? (да/нет)').strip().lower()
+            user_answer = input('Сундук заперт.Ввести код? (да/нет)').strip().lower()
             if user_answer == 'да':
                 puzzle = ROOMS[game_state['current_room']]['puzzle'][0]
                 puzzle_answer = ROOMS[game_state['current_room']]['puzzle'][1]
                 print(puzzle)
                 user_answer = input('Введите код:').strip().lower()
                 if user_answer == puzzle_answer:
-                    print('Вы верно ввели код, и замок щёлкает. Сундук открыт! Вы Победили!')
+                    print('Вы верно ввели код, и замок щёлкает.\n'
+                          ' Сундук открыт! Вы Победили!')
                     ROOMS[game_state['current_room']]['items'].remove('treasure_chest')
                     ROOMS[game_state['current_room']]['puzzle'] = None
                     game_state['game_over'] = True
@@ -115,15 +116,20 @@ def trigger_trap(game_state):
     """
     Функция имитирует срабатывание ловушки
     """
+    inventory = game_state['player_inventory']
+    steps = game_state['steps_taken']
+
+    if 'torch' in inventory:
+        print('Вы успешно заметили и обошли ловушки')
+        return
+
     print("Ловушка активирована! Пол стал дрожать...")
-    if game_state['player_inventory'] != []:
-        drop_item_number = psevdo_random(game_state['steps_taken'], len(game_state['player_inventory']))
-        print(game_state['player_inventory'])
-        print(f'Вы потеряли {game_state['player_inventory'][drop_item_number]}')
-        game_state['player_inventory'].pop(drop_item_number)
-        print(game_state['player_inventory'])
+    if inventory:
+        drop_item_number = psevdo_random(steps, len(inventory))
+        lost_item = inventory.pop(drop_item_number)
+        print(f'Вы потеряли {lost_item}')
     else:
-        take_damage = psevdo_random(game_state['steps_taken'], MAX_DAMAGE)
+        take_damage = psevdo_random(steps, MAX_DAMAGE)
         if take_damage >= HERO_HP:
             print(f'Вы получаете урон в {take_damage}, вы погибли. Игра закончена')
             game_state['game_over'] = True
@@ -131,22 +137,27 @@ def trigger_trap(game_state):
             print(f'Вы получаете урон в {take_damage}, но вы выжили')
 
 def random_event(game_state):
-    if psevdo_random(game_state['steps_taken'],RANDOM_EVENT) == 0:
-        event = psevdo_random(game_state['steps_taken'],EVENT_COUNT)
-        match event:
-            case 0:
-                print('Игрок находит на полу монетку')
-                ROOMS[game_state['current_room']]['items'].append('coin')
-            case 1:
-                print('Игрок слышит шорох')
-                if 'sword' in game_state['player_inventory']:
-                    print('Игрок отпугнул существо')
-            case 2:
-                if game_state['current_room'] == 'trap_room' and 'torch' not in game_state['player_inventory']:
-                    print('Опасность!')
-                    trigger_trap(game_state)
-                else:
-                    print('Вы успешно заметили и обошли ловушки')
+
+    inventory = game_state['player_inventory']
+    current_room = game_state['current_room']
+    steps = game_state['steps_taken']
+
+    if psevdo_random(steps,RANDOM_EVENT) != 0:
+        return
+
+    event = psevdo_random(steps,EVENT_COUNT)
+    match event:
+        case 0:
+            print('Игрок находит на полу монетку')
+            ROOMS[current_room]['items'].append('coin')
+        case 1:
+            print('Игрок слышит шорох')
+            if 'sword' in inventory:
+                print('Игрок отпугнул существо')
+        case 2:
+            if current_room == 'trap_room':
+                print('Опасность!')
+                trigger_trap(game_state)
 
 
 def show_help():
